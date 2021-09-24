@@ -2,15 +2,18 @@ import random
 
 from discord.ext import commands
 import discord
+from discord_components import DiscordComponents, Button, ButtonStyle, InteractionEventType, ComponentsBot
+
+
 from oath_data import settings
 
 
-def setup(bot: commands.Bot):
+def setup(bot):
     bot.add_cog(Base_commands(bot))
 
 
 class Base_commands(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: ComponentsBot):
         self.bot = bot
         self.menu_message_id = 0
 
@@ -37,11 +40,14 @@ class Base_commands(commands.Cog):
         except:
             await ctx.send("Wrong argument!")
 
-
     @commands.command(name="menu")
-    async def menu(self, ctx: commands.Context):
-        menu_mess = await ctx.send("What you want?")
-        self.menu_message_id = menu_mess.id
+    async def menu(self, ctx):
+        await ctx.send("Say hi!", components=[Button(label="Button", custom_id="hi", id='123')])
+        interaction = await self.bot.wait_for(
+            "button_click", check=lambda i: i.custom_id == "hi" and i.id == '123'
+        )
+        print(interaction)
+        await interaction.send(content="Button Clicked")
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -79,4 +85,5 @@ class Base_commands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        # DiscordComponents(self.bot)
         print('All is ready!')
