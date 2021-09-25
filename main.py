@@ -9,6 +9,7 @@ intents.members = True
 # bot = commands.Bot(command_prefix=settings['prefix'], intents=intents)
 bot = ComponentsBot(command_prefix=settings['prefix'], intents=intents)
 bot.load_extension("base_commands")
+bot.load_extension('error_handler')
 
 
 if __name__ == '__main__':

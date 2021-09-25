@@ -15,6 +15,7 @@ def setup(bot):
 class Base_commands(commands.Cog):
     def __init__(self, bot: ComponentsBot):
         self.bot = bot
+        self.last_5_deleted_msg = []
         self.menu_message_id = 0
 
     @commands.command(name="hello")
@@ -32,13 +33,13 @@ class Base_commands(commands.Cog):
     @commands.command(name="roll")
     async def roll_the_dice(self, ctx: commands.Context, *, max_value=None):
         """Roll number between 1 and by default 6 or number that you type after command"""
-        try:
-            if max_value:
+        if max_value:
+            if type(max_value) == 'int':
                 await ctx.send(f"You rolled {random.randint(1, int(max_value))}")
             else:
-                await ctx.send(f"You rolled {random.randint(1, 6)}")
-        except:
-            await ctx.send("Wrong argument!")
+                raise commands.UserInputError
+        else:
+            await ctx.send(f"You rolled {random.randint(1, 6)}")
 
     @commands.command(name="menu")
     async def menu(self, ctx):
@@ -48,6 +49,18 @@ class Base_commands(commands.Cog):
         )
         print(interaction)
         await interaction.send(content="Button Clicked")
+
+    @commands.command(namme='last5')
+    async def last5(self, ctx):
+        print(self.last_5_deleted_msg)
+        count = 1
+        embeds = []
+        for del_msg in self.last_5_deleted_msg:
+            content = f'{count}. {del_msg.author}: {del_msg.content}'
+            count += 1
+            embed = discord.Embed(description=content)
+            embeds.append(embed)
+        await ctx.send('last 5 deleted messages:', embeds=embeds)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -82,6 +95,13 @@ class Base_commands(commands.Cog):
     async def on_message(self, message):
         for em in ["🖤", "💔", "💚", "💜"]:
             await message.add_reaction(em)
+
+    @commands.Cog.listener()
+    async def on_raw_bulk_message_delete(self, message):
+        print(message)
+        if len(self.last_5_deleted_msg) == 5:
+            self.last_5_deleted_msg.pop(0)
+        self.last_5_deleted_msg.append(message)
 
     @commands.Cog.listener()
     async def on_ready(self):
