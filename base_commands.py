@@ -6,7 +6,7 @@ import discord
 from button_view import Menu_view
 # from discord import Button
 # from discord_components import DiscordComponents, Button, ButtonStyle, InteractionEventType, ComponentsBot
-
+from emojis import EMOJI_UNICODE_ENGLISH
 
 from oath_data import settings
 
@@ -74,7 +74,7 @@ class Base_commands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        await message.add_reaction(random.choice(["🖤", "💔", "💚", "💜"]))
+        await message.add_reaction(random.choice(list(EMOJI_UNICODE_ENGLISH.values())))
 
     @commands.Cog.listener()
     async def on_raw_bulk_message_delete(self, message):

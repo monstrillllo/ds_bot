@@ -1,7 +1,5 @@
 import discord
 from discord.ext import commands
-# from discord_components import ComponentsBot
-
 from oath_data import settings
 
 intents = discord.Intents.default()
