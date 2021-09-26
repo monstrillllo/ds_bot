@@ -1,8 +1,11 @@
 import random
-
+from discord.ui import button, View, Button
+from discord.interactions import Interaction
 from discord.ext import commands
 import discord
-from discord_components import DiscordComponents, Button, ButtonStyle, InteractionEventType, ComponentsBot
+from button_view import Menu_view
+# from discord import Button
+# from discord_components import DiscordComponents, Button, ButtonStyle, InteractionEventType, ComponentsBot
 
 
 from oath_data import settings
@@ -13,7 +16,7 @@ def setup(bot):
 
 
 class Base_commands(commands.Cog):
-    def __init__(self, bot: ComponentsBot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.last_5_deleted_msg = []
         self.menu_message_id = 0
@@ -23,12 +26,6 @@ class Base_commands(commands.Cog):
         """Greets the user!"""
         author = ctx.message.author
         await ctx.send(f'hello, {author.mention}!')
-
-    @commands.command(name="setstatus")
-    async def setstatus(self, ctx: commands.Context, *, text: str):
-        """Sets the bot status to *text*"""
-        await self.bot.change_presence(activity=discord.Game(name=text))
-        await ctx.send('The status was set!')
 
     @commands.command(name="roll")
     async def roll_the_dice(self, ctx: commands.Context, *, max_value=None):
@@ -42,25 +39,9 @@ class Base_commands(commands.Cog):
             await ctx.send(f"You rolled {random.randint(1, 6)}")
 
     @commands.command(name="menu")
-    async def menu(self, ctx):
-        await ctx.send("Say hi!", components=[Button(label="Button", custom_id="hi", id='123')])
-        interaction = await self.bot.wait_for(
-            "button_click", check=lambda i: i.custom_id == "hi" and i.id == '123'
-        )
-        print(interaction)
-        await interaction.send(content="Button Clicked")
-
-    @commands.command(namme='last5')
-    async def last5(self, ctx):
-        print(self.last_5_deleted_msg)
-        count = 1
-        embeds = []
-        for del_msg in self.last_5_deleted_msg:
-            content = f'{count}. {del_msg.author}: {del_msg.content}'
-            count += 1
-            embed = discord.Embed(description=content)
-            embeds.append(embed)
-        await ctx.send('last 5 deleted messages:', embeds=embeds)
+    async def menu(self, ctx: commands.Context):
+        embed = discord.Embed(title='Menu', description='Choose what you want to do.', colour=65535)
+        await ctx.send(embed=embed, view=Menu_view(self.bot))
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -93,8 +74,7 @@ class Base_commands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        for em in ["🖤", "💔", "💚", "💜"]:
-            await message.add_reaction(em)
+        await message.add_reaction(random.choice(["🖤", "💔", "💚", "💜"]))
 
     @commands.Cog.listener()
     async def on_raw_bulk_message_delete(self, message):
@@ -105,5 +85,4 @@ class Base_commands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        # DiscordComponents(self.bot)
         print('All is ready!')
