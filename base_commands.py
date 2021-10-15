@@ -3,7 +3,7 @@ from discord.ui import button, View, Button
 from discord.interactions import Interaction
 from discord.ext import commands
 import discord
-from button_view import Menu_view
+from button_view import MenuView
 # from discord import Button
 # from discord_components import DiscordComponents, Button, ButtonStyle, InteractionEventType, ComponentsBot
 from emojis import EMOJI_UNICODE_ENGLISH
@@ -41,11 +41,11 @@ class Base_commands(commands.Cog):
     @commands.command(name="menu")
     async def menu(self, ctx: commands.Context):
         embed = discord.Embed(title='Menu', description='Choose what you want to do.', colour=65535)
-        await ctx.send(embed=embed, view=Menu_view(self.bot))
+        await ctx.send(embed=embed, view=MenuView(self.bot))
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
-        if payload.message_id == self.menu_message_id and payload.user_id != settings['id']:
+        if payload.message_id == self.menu_message_id:
             channel = self.bot.get_channel(payload.channel_id)
             if not channel:
                 return

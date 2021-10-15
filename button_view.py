@@ -1,13 +1,15 @@
+import json
+
 from discord import ButtonStyle, PartialEmoji
-from discord.types.emoji import Emoji
 from discord.ui import button, View, Button, select, Select
 from discord.interactions import Interaction
 from discord.ext import commands
 from discord import SelectOption
 import discord
+import socket
 
 
-class Menu_view(View):
+class MenuView(View):
     def __init__(self, bot: discord.ext.commands.Bot):
         super().__init__(timeout=None)
         self.bot = bot
@@ -16,7 +18,34 @@ class Menu_view(View):
     @button(label='learn', custom_id='learn', style=ButtonStyle.green)
     async def button1_clicked(self, button_: Button, interaction: Interaction):
         channel = self.bot.get_channel(interaction.channel_id)
-        await channel.send(f'You press {button_.label}, but at this moment that do nothing!')
+        request_json = json.dumps({
+                          "Type": "Article",
+                          "Name": "loops",
+                          "Information": "",
+                          "Theme": [
+                            {
+                              "Name": "Basic",
+                              "Weight": 1
+                            }
+                          ],
+                          "DirectsTasks": [
+                            "loops_1"
+                          ]
+                        })
+        try:
+            with socket.socket() as sock:
+                sock.connect(('192.168.43.68', 8888))
+                sock.send(len(request_json).to_bytes(4, 'little', signed=True))
+                sock.send(request_json.encode())
+                data = sock.recv(1024).decode()
+                sock.send(len(request_json).to_bytes(4, 'little', signed=True))
+                sock.send(request_json.encode())
+                data = sock.recv(1024).decode()
+                json_data = json.loads(data)
+                embed = discord.Embed(title=json_data['task']['name'], description=json_data['description'], colour=65535)
+                await channel.send(embed=embed)
+        except Exception as _ex:
+            await channel.send(f'[+] Error: {_ex}')
 
     @button(label='testing', custom_id='testing', style=ButtonStyle.blurple)
     async def button2_clicked(self, button_: Button, interaction: Interaction):
