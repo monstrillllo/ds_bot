@@ -3,11 +3,11 @@ from discord.ui import button, View, Button
 from discord.interactions import Interaction
 from discord.ext import commands
 import discord
-from button_view import MenuView
+from menu_view import MenuView
 # from discord import Button
 # from discord_components import DiscordComponents, Button, ButtonStyle, InteractionEventType, ComponentsBot
 from emojis import EMOJI_UNICODE_ENGLISH
-
+from re import search, IGNORECASE
 from oath_data import settings
 
 
@@ -44,44 +44,13 @@ class Base_commands(commands.Cog):
         await ctx.send(embed=embed, view=MenuView(self.bot))
 
     @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-        if payload.message_id == self.menu_message_id:
-            channel = self.bot.get_channel(payload.channel_id)
-            if not channel:
-                return
-            await channel.send(f"You add {payload.emoji} to message!")
-
-    @commands.Cog.listener()
-    async def on_member_remove(self, member: discord.Member):
-        channel = self.bot.get_channel(766010486969204748)
-        if not channel:
-            return
-        await channel.send(f"Покеда, {member}!")
-
-    @commands.Cog.listener()
-    async def on_member_join(self, member: discord.Member):
-        channel = self.bot.get_channel(766010486969204748)
-        if not channel:
-            return
-        await channel.send(f"Welcome, {member}!")
-        # print(member.guild.roles)
-        role = None
-        for r in member.guild.roles:
-            if r.name == 'clown':
-                role = r
-                break
-        await member.add_roles(role)
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        await message.add_reaction(random.choice(list(EMOJI_UNICODE_ENGLISH.values())))
-
-    @commands.Cog.listener()
-    async def on_raw_bulk_message_delete(self, message):
-        print(message)
-        if len(self.last_5_deleted_msg) == 5:
-            self.last_5_deleted_msg.pop(0)
-        self.last_5_deleted_msg.append(message)
+    async def on_message(self, message: discord.Message):
+        try:
+            if search('COCK', message.content, flags=IGNORECASE) and message.author.id != 766005466136313877:
+                await message.channel.send('https://tenor.com/view/didsomeonesaycock-didsomeonesay-yep-pepe-yeppers-gif-19924664')
+            await message.add_reaction(random.choice(list(EMOJI_UNICODE_ENGLISH.values())))
+        except Exception:
+            pass
 
     @commands.Cog.listener()
     async def on_ready(self):
