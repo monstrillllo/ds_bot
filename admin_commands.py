@@ -1,6 +1,4 @@
 import discord
-
-from oath_data import settings
 from discord.ext import commands
 
 

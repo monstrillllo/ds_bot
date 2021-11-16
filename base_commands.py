@@ -1,14 +1,9 @@
 import random
-from discord.ui import button, View, Button
-from discord.interactions import Interaction
 from discord.ext import commands
 import discord
 from menu_view import MenuView
-# from discord import Button
-# from discord_components import DiscordComponents, Button, ButtonStyle, InteractionEventType, ComponentsBot
 from emojis import EMOJI_UNICODE_ENGLISH
 from re import search, IGNORECASE
-from oath_data import settings
 
 
 def setup(bot):
@@ -31,15 +26,16 @@ class Base_commands(commands.Cog):
     async def roll_the_dice(self, ctx: commands.Context, *, max_value=None):
         """Roll number between 1 and by default 6 or number that you type after command"""
         if max_value:
-            if type(max_value) == 'int':
-                await ctx.send(f"You rolled {random.randint(1, int(max_value))}")
+            if max_value.isdigit():
+                await ctx.reply(f"You rolled {random.randint(1, int(max_value))}")
             else:
                 raise commands.UserInputError
         else:
-            await ctx.send(f"You rolled {random.randint(1, 6)}")
+            await ctx.reply(f"You rolled {random.randint(1, 6)}")
 
     @commands.command(name="menu")
     async def menu(self, ctx: commands.Context):
+        """Show learning menu"""
         embed = discord.Embed(title='Menu', description='Choose what you want to do.', colour=65535)
         await ctx.send(embed=embed, view=MenuView(self.bot))
 
