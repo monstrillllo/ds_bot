@@ -9,10 +9,10 @@ class Connection:
         print('Connected')
 
     async def send_request(self, request_json: str):
-        print('Request: ', request_json)
+        # print('Request: ', request_json)
         self.sock.send(len(request_json).to_bytes(4, 'little', signed=True))
         self.sock.send(request_json.encode())
-        data = self.sock.recv(1024).decode()
-        print('Data: ', data)
+        data = self.sock.recv(5000).decode()
+        # print('Data: ', data)
         json_data = json.loads(data)
         return json_data
